@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>정산 프로그램</title>
-  <!-- Google Fonts (원하는 경우) -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     /* 기본 리셋 및 폰트 */
@@ -14,14 +14,14 @@
       background: #f5f6fa;
       color: #2f3640;
     }
-    /* 전체 레이아웃: 좌측 사이드바 + 우측 메인 영역 */
+    /* 전체 레이아웃 */
     #container {
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
     /* ─────────────────────────────
-       좌측 사이드바: 참가자 관리
+       좌측 사이드바: 참가자 관리 및 정산서 복사
     ───────────────────────────── */
     #sidebar {
       width: 300px;
@@ -76,7 +76,7 @@
       font-size: 16px;
       line-height: 1.2;
     }
-    /* 삭제 버튼을 작고 간결하게 */
+    /* 삭제 버튼 간결하게 */
     #participantList li button {
       background: transparent;
       border: none;
@@ -98,7 +98,7 @@
       cursor: pointer;
     }
     /* ─────────────────────────────
-       우측 메인 영역
+       우측 메인 영역: 정산 항목 및 세부 내역서
     ───────────────────────────── */
     #main {
       flex: 1;
@@ -173,13 +173,23 @@
     .expense-row input[type="checkbox"] {
       margin-right: 6px;
     }
+    /* 개별 추가 부담 금액 입력란: type을 number로 유지하고 스피너 숨김, 크기 조절 */
     .expense-row input.manual-override {
-      width: 80px;
-      padding: 4px 6px;
+      width: 200px;
+      height: 40px;
+      padding: 6px 10px;
       font-size: 16px;
       border: 1px solid #dcdde1;
       border-radius: 4px;
       text-align: right;
+    }
+    .expense-row input.manual-override::-webkit-inner-spin-button,
+    .expense-row input.manual-override::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .expense-row input.manual-override {
+      -moz-appearance: textfield;
     }
     .expense-row span.computed-share {
       width: 100px;
@@ -337,7 +347,7 @@
     }
     #saveEditBtn { background: #40739e; color: #fff; }
     #cancelEditBtn { background: #7f8fa6; color: #fff; margin-left: 10px; }
-    /* 반응형: 창 크기에 따라 유동적으로 */
+    /* 반응형 */
     @media (max-width: 768px) {
       #container { flex-direction: column; }
       #sidebar { width: 100%; border-right: none; border-bottom: 1px solid #dcdde1; }
@@ -346,7 +356,7 @@
 </head>
 <body>
   <div id="container">
-    <!-- 좌측: 참가자 관리 -->
+    <!-- 좌측: 참가자 관리 및 정산서 복사 -->
     <div id="sidebar">
       <div>
         <h2>참가자 관리</h2>
@@ -354,7 +364,6 @@
         <button id="addParticipantBtn">추가</button>
         <ul id="participantList"></ul>
       </div>
-      <!-- 좌측 하단: 정산서 복사 버튼 -->
       <button id="copyReportBtn">정산서 복사</button>
     </div>
     <!-- 우측: 정산 항목 및 세부 내역서 -->
@@ -407,6 +416,38 @@
 
   <script>
     /***********************************
+     * 데이터 영속성 관련 함수 (localStorage)
+    ***********************************/
+    function saveData() {
+      localStorage.setItem("participants", JSON.stringify(participants));
+      localStorage.setItem("expenseLog", JSON.stringify(expenseLog));
+      localStorage.setItem("participantIdCounter", participantIdCounter);
+      localStorage.setItem("expenseIdCounter", expenseIdCounter);
+    }
+    function loadData() {
+      const pData = localStorage.getItem("participants");
+      if(pData) { participants = JSON.parse(pData); }
+      const eData = localStorage.getItem("expenseLog");
+      if(eData) { expenseLog = JSON.parse(eData); }
+      const pCounter = localStorage.getItem("participantIdCounter");
+      if(pCounter) { participantIdCounter = parseInt(pCounter); }
+      const eCounter = localStorage.getItem("expenseIdCounter");
+      if(eCounter) { expenseIdCounter = parseInt(eCounter); }
+    }
+
+    /***********************************
+     * 헬퍼 함수
+    ***********************************/
+    // 개별 항목은 소수점 이하 버림하여 표시 (화면에만 정수 부분 표시)
+    function formatIndividual(amount) {
+      return Math.floor(amount).toLocaleString() + "원";
+    }
+    // 총액은 합산 후 소수점 이하 버림하여 정수 부분만 표시
+    function formatTotal(amount) {
+      return Math.floor(amount).toLocaleString() + "원";
+    }
+
+    /***********************************
      * 전역 변수 및 데이터 모델
     ***********************************/
     let participants = []; // { id, name, total }
@@ -453,17 +494,19 @@
       participants.push(participant);
       updateParticipantList();
       updateExpenseParticipants();
+      saveData();
     }
     function removeParticipant(id) {
       participants = participants.filter(p => p.id !== id);
       updateParticipantList();
       updateExpenseParticipants();
+      saveData();
     }
     function updateParticipantList() {
       participantListEl.innerHTML = "";
       participants.forEach(p => {
         const li = document.createElement("li");
-        li.innerHTML = `<span>${p.name} (<strong>${formatAmount(p.total)}</strong>)</span>
+        li.innerHTML = `<span>${p.name} (<strong>${formatTotal(p.total)}</strong>)</span>
                         <button data-id="${p.id}">&times;</button>`;
         li.querySelector("button").addEventListener("click", function() {
           removeParticipant(parseInt(this.getAttribute("data-id")));
@@ -484,10 +527,9 @@
           <label>
             <input type="checkbox" class="expense-check" value="${p.id}"> ${p.name}
           </label>
-          <input type="number" class="manual-override" placeholder="추가" value="0" min="0">
+          <input type="number" class="manual-override" placeholder="개인 추가 금액(예: 8000)" value="" step="any">
           <span class="computed-share">0원</span>
         `;
-        // 이벤트: 변경 시 분담액 재계산
         const checkbox = div.querySelector(".expense-check");
         const manualInput = div.querySelector(".manual-override");
         checkbox.addEventListener("change", updateComputedShares);
@@ -518,18 +560,21 @@
       });
       let remainder = totalValue - manualSum;
       if(remainder < 0) remainder = 0;
-      const baseShare = selectedRows.length > 0 ? remainder / selectedRows.length : 0;
-      selectedRows.forEach(row => {
-        const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
-        const computed = baseShare + manualVal;
-        row.querySelector(".computed-share").textContent = formatAmount(computed);
-      });
-      // 미선택 행은 0원으로 표시
+      const n = selectedRows.length;
+      if(n > 0) {
+         const share = remainder / n;  // 실제 개별 분담액 (소수점 포함)
+         selectedRows.forEach(row => {
+           const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
+           const computed = share + manualVal;
+           // 개별 항목은 소수점 이하 버림하여 표시
+           row.querySelector(".computed-share").textContent = formatIndividual(computed);
+         });
+      }
       rows.forEach(row => {
-        const cb = row.querySelector(".expense-check");
-        if(!cb.checked) {
-          row.querySelector(".computed-share").textContent = "0원";
-        }
+         const cb = row.querySelector(".expense-check");
+         if(!cb.checked) {
+           row.querySelector(".computed-share").textContent = "0원";
+         }
       });
     }
 
@@ -545,39 +590,34 @@
       }
       const rows = document.querySelectorAll(".expense-row");
       let distribution = [];
-      let selectedCount = 0;
+      let selectedRows = [];
       rows.forEach(row => {
         const cb = row.querySelector(".expense-check");
-        if(cb.checked) selectedCount++;
+        if(cb.checked) selectedRows.push(row);
       });
-      if(selectedCount === 0) {
+      if(selectedRows.length === 0) {
         alert("정산에 참여할 참가자를 선택하세요.");
         return;
       }
       let manualSum = 0;
-      rows.forEach(row => {
-        const cb = row.querySelector(".expense-check");
-        if(cb.checked) {
-          const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
-          manualSum += manualVal;
-        }
+      selectedRows.forEach(row => {
+        const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
+        manualSum += manualVal;
       });
       let remainder = totalExpense - manualSum;
       if(remainder < 0) remainder = 0;
-      const baseShare = remainder / selectedCount;
-      rows.forEach(row => {
-        const cb = row.querySelector(".expense-check");
-        if(cb.checked) {
-          const participantId = parseInt(cb.value);
-          const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
-          const computed = baseShare + manualVal;
-          distribution.push({
-            participantId,
-            name: participants.find(p => p.id === participantId).name,
-            manual: manualVal,
-            computed: computed
-          });
-        }
+      const n = selectedRows.length;
+      const share = n > 0 ? (remainder / n) : 0;  // 실제 개별 분담액 (소수점 포함)
+      selectedRows.forEach(row => {
+        const participantId = parseInt(row.querySelector(".expense-check").value);
+        const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
+        const computed = share + manualVal;
+        distribution.push({
+          participantId,
+          name: participants.find(p => p.id === participantId).name,
+          manual: manualVal,
+          computed: computed
+        });
       });
       const expenseEntry = {
         id: expenseIdCounter++,
@@ -597,11 +637,12 @@
       const allRows = document.querySelectorAll(".expense-row");
       allRows.forEach(row => {
         row.querySelector(".expense-check").checked = false;
-        row.querySelector(".manual-override").value = "0";
+        row.querySelector(".manual-override").value = "";
         row.querySelector(".computed-share").textContent = "0원";
       });
       allSelected = false;
       toggleAllBtn.textContent = "전체 선택";
+      saveData();
     });
 
     /***********************************
@@ -609,14 +650,13 @@
     ***********************************/
     function updateExpenseLog() {
       expenseLogEl.innerHTML = "";
-      // 최신 순 (내림차순)
       expenseLog.slice().reverse().forEach(entry => {
         const div = document.createElement("div");
         div.className = "log-entry";
         div.innerHTML = `
-          <header>[${entry.time}] - ${entry.reason} (총 ${formatAmount(entry.total)})</header>
+          <header>[${entry.time}] - ${entry.reason} (총 ${formatTotal(entry.total)})</header>
           <div class="log-details">
-            ${entry.distribution.map(d => `<span>${d.name}: ${formatAmount(d.computed)}${d.manual > 0 ? " (+" + formatAmount(d.manual) + ")" : ""}</span>`).join("")}
+            ${entry.distribution.map(d => `<span>${d.name}: ${formatIndividual(d.computed)}${d.manual > 0 ? " (+" + formatIndividual(d.manual) + ")" : ""}</span>`).join("")}
           </div>
           <div class="log-actions">
             <button class="edit-btn" data-id="${entry.id}">수정</button>
@@ -643,9 +683,9 @@
         recalcParticipantsTotals();
         updateExpenseLog();
         updateParticipantList();
+        saveData();
       }
     }
-    // 참가자 총액을 모든 expenseLog를 기준으로 재계산
     function recalcParticipantsTotals() {
       participants.forEach(p => p.total = 0);
       expenseLog.forEach(entry => {
@@ -655,23 +695,18 @@
         });
       });
     }
-    function formatAmount(amount) {
-      return Number(amount.toFixed(0)).toLocaleString() + "원";
-    }
 
     /***********************************
      * 정산서 복사 기능 (텍스트 보고서 생성 및 클립보드 복사)
     ***********************************/
     copyReportBtn.addEventListener("click", () => {
       let report = "";
-      // 각 참가자별 보고서 생성
       participants.forEach(p => {
-        report += `[${p.name}] 총액: ${formatAmount(p.total)}\n`;
+        report += `[${p.name}] 총액: ${formatTotal(p.total)}\n`;
         expenseLog.forEach(entry => {
-          // 각 expenseEntry의 distribution에서 해당 참가자가 있는지 확인
           const dist = entry.distribution.find(d => d.participantId === p.id);
           if(dist) {
-            report += `${entry.time} - ${entry.reason} - ${formatAmount(dist.computed)}\n`;
+            report += `${entry.time} - ${entry.reason} - ${formatIndividual(dist.computed)}\n`;
           }
         });
         report += "\n";
@@ -701,8 +736,9 @@
       entry.distribution.forEach(d => {
         const row = document.createElement("div");
         row.className = "edit-row";
+        // 표시되는 값은 정수부만 보이도록 Math.floor()를 적용합니다.
         row.innerHTML = `<span>${d.name}</span>
-                         <input type="number" value="${d.computed}" min="0" data-participant="${d.participantId}">`;
+                         <input type="number" value="${Math.floor(d.computed)}" min="0" data-participant="${d.participantId}" step="any">`;
         editDistributionEl.appendChild(row);
       });
       editExpenseModal.style.display = "flex";
@@ -743,6 +779,7 @@
       updateExpenseLog();
       updateParticipantList();
       closeEditModal();
+      saveData();
     });
 
     /***********************************
@@ -758,9 +795,11 @@
       participantNameInput.value = "";
     });
 
-    // 초기 업데이트
+    // 데이터 로드 후 초기 업데이트
+    loadData();
     updateParticipantList();
     updateExpenseParticipants();
+    updateExpenseLog();
   </script>
 </body>
 </html>
