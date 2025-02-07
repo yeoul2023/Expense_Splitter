@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>정산 프로그램 - Ultimate Edition (휴양지 Edition)</title>
+  <title>Expense_Splitter(휴양지 Edition)</title>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -12,153 +12,124 @@
       font-family: 'Roboto', sans-serif;
       background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
       color: #333;
-      transition: background 0.3s, color 0.3s;
+      line-height: 1.5;
+      padding: 10px;
     }
-    body.dark-mode {
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #eee;
-    }
-    /* 입력 필드 배경 그라데이션 */
-    input[type="text"],
-    input[type="number"] {
-      background: linear-gradient(180deg, #F5F5F5, #E0E0E0);
-      color: inherit;
-    }
-    body.dark-mode input[type="text"],
-    body.dark-mode input[type="number"] {
-      background: linear-gradient(180deg, #424242, #616161);
-      color: #fff;
-    }
-    
-    /* 기본 테두리 및 버튼 변수 */
     :root {
       --input-border: 1px solid rgba(0,0,0,0.2);
+      --border-radius: 4px;
+      --transition-speed: 0.2s;
     }
-    
+    /* select 기본 화살표 제거 */
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: none;
+    }
     /* 전체 레이아웃 */
     #container {
       display: flex;
-      height: 100vh;
+      height: calc(100vh - 20px);
+      background: #fff;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       overflow: hidden;
     }
-    
     /* 좌측 사이드바 */
     #sidebar {
       width: 320px;
-      background: rgba(255, 255, 255, 0.85);
-      border-right: 1px solid rgba(255,255,255,0.8);
-      padding: 20px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      border-right: 1px solid #e0e0e0;
+    }
+    #participantContainer {
+      flex: 1;
       overflow-y: auto;
-      backdrop-filter: blur(4px);
-      transition: background 0.3s, border-color 0.3s;
+      padding: 20px;
     }
-    body.dark-mode #sidebar {
-      background: rgba(0, 0, 0, 0.75);
-      border-color: rgba(255,255,255,0.3);
-    }
-    
-    /* 참가자 관리 영역 */
     #participantSection h2 {
-      font-size: 22px;
+      font-size: 20px;
       margin-bottom: 10px;
     }
     #participantSection input[type="text"] {
       width: 100%;
-      padding: 8px 10px;
+      padding: 10px;
       font-size: 16px;
       border: var(--input-border);
-      border-radius: 4px;
+      border-radius: var(--border-radius);
       margin-bottom: 10px;
+      background: #f9f9f9;
     }
-    /* 참가자 추가 버튼 - 파스텔 민트 그라데이션 */
     #addParticipantBtn {
       width: 100%;
       padding: 10px;
       font-size: 16px;
       background: linear-gradient(45deg, #a8e6cf, #dcedc1);
-      color: #333;
       border: none;
-      border-radius: 4px;
+      border-radius: var(--border-radius);
       cursor: pointer;
+      transition: background var(--transition-speed);
       margin-bottom: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
+    #addParticipantBtn:hover { background: linear-gradient(45deg, #92d8bb, #c5e0aa); }
     #participantList {
       list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     #participantList li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 8px;
-      margin-bottom: 8px;
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 4px;
+      padding: 10px;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
       background: #fff;
-      white-space: nowrap;
-      font-size: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      position: relative;
     }
-    body.dark-mode #participantList li {
-      background: rgba(0,0,0,0.8);
-      border-color: rgba(255,255,255,0.2);
+    #participantList li .p-name {
+      font-weight: 500;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    #participantList li .p-totals {
+      font-size: 14px;
+      color: #555;
+      margin-top: 4px;
     }
     #participantList li button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
       background: transparent;
       border: none;
-      color: #333;
       font-size: 20px;
       cursor: pointer;
-      margin-left: 10px;
+      color: #d9534f;
     }
-    body.dark-mode #participantList li button {
-      color: #eee;
-    }
-    
     /* 글로벌 컨트롤 영역 */
     #globalControls {
-      margin-top: 20px;
-    }
-    #globalControls select {
-      width: 100%;
       padding: 10px;
-      font-size: 16px;
-      border: var(--input-border);
-      border-radius: 4px;
-      margin-bottom: 10px;
+      border-top: 1px solid #e0e0e0;
       background: #fff;
-      color: inherit;
-    }
-    /* 기능별 버튼 색상 */
-    #copyReportBtn {
-      background: linear-gradient(45deg, #aedff7, #87cefa);
-      color: #333;
-    }
-    #exportDataBtn {
-      background: linear-gradient(45deg, #d1c4e9, #b39ddb);
-      color: #333;
-    }
-    #resetDataBtn {
-      background: linear-gradient(45deg, #ffccd2, #ef9a9a);
-      color: #333;
-    }
-    #toggleDarkModeBtn {
-      background: linear-gradient(45deg, #cfd8dc, #b0bec5);
-      color: #333;
+      position: sticky;
+      bottom: 0;
+      z-index: 1;
     }
     #globalControls button {
       width: 100%;
       padding: 10px;
       font-size: 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
       margin-bottom: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      cursor: pointer;
+      transition: background var(--transition-speed);
     }
-    
+    #copyReportBtn { background: linear-gradient(45deg, #aedff7, #87cefa); color: #333; }
+    #exportDataBtn { background: linear-gradient(45deg, #d1c4e9, #b39ddb); color: #333; }
+    #resetDataBtn { background: linear-gradient(45deg, #ffccd2, #ef9a9a); color: #333; }
+    #settingsBtn { background: linear-gradient(45deg, #cfd8dc, #b0bec5); color: #333; }
     /* 우측 메인 영역 */
     #main {
       flex: 1;
@@ -170,161 +141,205 @@
     }
     /* 정산 항목 추가 영역 */
     #expenseSection {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 6px;
+      background: #fff;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
       padding: 20px;
-    }
-    body.dark-mode #expenseSection {
-      background: rgba(0,0,0,0.75);
-      border-color: rgba(255,255,255,0.3);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     #expenseSection h2 {
       font-size: 20px;
       margin-bottom: 10px;
     }
+    /* 정산 사유, 날짜, 시각 입력 – 한 줄에 배치 */
     .expense-inputs {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       margin-bottom: 15px;
     }
-    .expense-inputs input[type="text"],
-    .expense-inputs input[type="number"] {
-      flex: 1 1 200px;
-      padding: 8px 10px;
+    .expense-inputs label {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 4px;
+      display: block;
+    }
+    #expenseReason {
+      width: 100%;
+      padding: 10px;
       font-size: 16px;
       border: var(--input-border);
-      border-radius: 4px;
-      background: linear-gradient(180deg, #F5F5F5, #E0E0E0);
-      color: inherit;
+      border-radius: var(--border-radius);
+      background: #f9f9f9;
     }
-    .expense-participants-wrapper {
+    /* 날짜와 시간 입력: 드롭다운 그룹 */
+    .date-time-group {
+      display: flex;
+      gap: 5px;
+    }
+    .date-time-group select {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
+      background: #f9f9f9;
+    }
+    /* 화폐별 금액 입력 영역 */
+    #expenseCurrenciesContainer {
+      margin-bottom: 15px;
+      display: grid;
+      gap: 10px;
+    }
+    .expense-currency-row {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 8px;
     }
-    /* 전체 선택 버튼: 부드러운 청록 계열 */
-    #toggleAllBtn {
+    .expense-currency-row select {
+      width: 80px;
+      padding: 10px;
+      font-size: 16px;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
+      background: #f9f9f9;
+    }
+    .expense-currency-row input[type="number"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
+      background: #f9f9f9;
+    }
+    .expense-currency-row button.remove-currency {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #d9534f;
+    }
+    #addExpenseCurrencyBtn {
       padding: 8px 12px;
       background: linear-gradient(45deg, #80deea, #4dd0e1);
       color: #333;
       border: none;
-      border-radius: 4px;
-      font-size: 14px;
+      border-radius: var(--border-radius);
+      font-size: 16px;
       cursor: pointer;
     }
-    #expenseParticipantsContainer {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    /* 분배 영역 */
+    #expenseDistributionWrapper {
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      margin-bottom: 15px;
     }
-    .expense-row {
+    #toggleAllBtn {
+      padding: 8px 12px;
+      background: linear-gradient(45deg, #80deea, #4dd0e1);
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    #expenseDistributionContainer {
+      display: grid;
+      gap: 10px;
+    }
+    .distribution-row {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
-      padding: 8px;
+      gap: 10px;
+      padding: 10px;
       border: var(--input-border);
-      border-radius: 4px;
+      border-radius: var(--border-radius);
       background: #fff;
     }
-    body.dark-mode .expense-row {
-      background: rgba(0,0,0,0.8);
-      border-color: rgba(255,255,255,0.2);
-    }
-    .expense-row label {
-      flex: 1;
+    .distribution-row .participant-name {
+      min-width: 120px;
       font-size: 16px;
-      cursor: pointer;
+      font-weight: 500;
     }
-    .expense-row input[type="checkbox"] {
-      margin-right: 6px;
+    .currency-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      min-width: 100px;
     }
-    .expense-row input.manual-override {
-      width: 200px;
-      height: 40px;
-      padding: 6px 10px;
-      font-size: 16px;
-      border: var(--input-border);
-      border-radius: 4px;
-      text-align: right;
-      background: linear-gradient(180deg, #F5F5F5, #E0E0E0);
-      color: inherit;
-    }
-    .expense-row input.manual-override::-webkit-inner-spin-button,
-    .expense-row input.manual-override::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    .expense-row input.manual-override { -moz-appearance: textfield; }
-    .expense-row span.computed-share {
-      width: 100px;
-      font-size: 16px;
-      text-align: right;
+    .currency-group .group-label {
+      font-size: 14px;
+      font-weight: 500;
       color: #333;
     }
-    /* 정산 항목 추가 버튼: 파스텔 오렌지 계열 */
-    #addExpenseBtn {
+    .currency-group input.manual-override {
       width: 100%;
       padding: 10px;
       font-size: 16px;
-      background: linear-gradient(45deg, #ffcc80, #ffb74d);
+      border: var(--input-border);
+      border-radius: var(--border-radius);
+      text-align: right;
+      background: #f9f9f9;
+    }
+    .currency-group span.computed-share {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      text-align: right;
       color: #333;
+    }
+    #addExpenseBtn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(45deg, #ffcc80, #ffb74d);
       border: none;
-      border-radius: 4px;
+      border-radius: var(--border-radius);
+      font-size: 18px;
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
-    
     /* 세부 내역서 섹션 */
     #logSection {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 6px;
+      background: #fff;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
       padding: 20px;
       flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    body.dark-mode #logSection {
-      background: rgba(0,0,0,0.75);
-      border-color: rgba(255,255,255,0.3);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     #logSection h2 {
       font-size: 20px;
       margin-bottom: 10px;
     }
     .log-entry {
-      border-bottom: 1px solid rgba(0,0,0,0.1);
+      border-bottom: 1px solid #ddd;
       padding: 10px 0;
     }
     .log-entry:last-child { border-bottom: none; }
     .log-entry header {
       font-size: 14px;
       margin-bottom: 5px;
+      color: #555;
     }
     .log-entry .log-details {
-      font-size: 16px;
+      font-size: 14px;
       margin-bottom: 5px;
-    }
-    .log-entry .log-details span {
-      margin-right: 10px;
+      color: #333;
+      white-space: pre-wrap;
     }
     .log-entry .log-actions button {
-      padding: 4px 8px;
+      padding: 6px 10px;
       font-size: 14px;
-      border: var(--btn-border);
-      border-radius: 4px;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
       cursor: pointer;
       margin-right: 6px;
       background: linear-gradient(45deg, #aedff7, #87cefa);
       color: #333;
     }
-    
-    /* 모달 (정산 내역 수정) */
+    /* 모달 기본 스타일 (display:none 시작) */
     .modal {
       display: none;
       position: fixed;
@@ -336,13 +351,14 @@
       background-color: rgba(0,0,0,0.5);
       align-items: center;
       justify-content: center;
+      padding: 20px;
     }
     .modal-content {
       background: #fff;
       padding: 20px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 500px;
+      border-radius: var(--border-radius);
+      width: 100%;
+      max-width: 600px;
       position: relative;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
@@ -356,70 +372,94 @@
       right: 15px;
       font-size: 24px;
       font-weight: bold;
-      color: #333;
       cursor: pointer;
+      color: #333;
     }
+    /* 편집 모달 – 날짜/시간 드롭다운 */
     #editExpenseForm label {
       display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    .edit-time-inputs {
+      display: flex;
+      gap: 5px;
       margin-bottom: 10px;
-      font-size: 16px;
     }
-    #editExpenseForm input[type="text"],
-    #editExpenseForm input[type="number"] {
-      width: 100%;
-      padding: 8px 10px;
+    .edit-time-inputs select {
+      flex: 1;
+      padding: 10px;
       font-size: 16px;
-      margin-top: 4px;
       border: var(--input-border);
-      border-radius: 4px;
-      background: linear-gradient(180deg, #F5F5F5, #E0E0E0);
-      color: inherit;
+      border-radius: var(--border-radius);
+      background: #f9f9f9;
     }
-    #editDistribution {
-      margin-top: 15px;
-      max-height: 200px;
-      overflow-y: auto;
+    /* 설정 모달 */
+    #settingsForm label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
     }
-    #editDistribution .edit-row {
+    #settingsForm input[type="text"],
+    #settingsForm select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
+      background: #f9f9f9;
+      margin-bottom: 10px;
+    }
+    #exchangeRatesContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .exchange-rate-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 0;
-      border-bottom: var(--input-border);
     }
-    #editDistribution .edit-row:last-child { border-bottom: none; }
-    #editDistribution span { flex: 1; font-size: 16px; }
-    #editDistribution input {
+    .exchange-rate-row select {
       width: 100px;
-      padding: 4px 6px;
+      padding: 10px;
       font-size: 16px;
       border: var(--input-border);
-      border-radius: 4px;
-      text-align: right;
-      background: linear-gradient(180deg, #F5F5F5, #E0E0E0);
-      color: inherit;
+      border-radius: var(--border-radius);
+      background: #f9f9f9;
     }
-    #saveEditBtn, #cancelEditBtn {
-      padding: 10px 15px;
+    .exchange-rate-row span {
       font-size: 16px;
-      border: var(--btn-border);
-      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .exchange-rate-row input[type="number"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: var(--input-border);
+      border-radius: var(--border-radius);
+      background: #f9f9f9;
+    }
+    .exchange-rate-row button.remove-rate {
+      background: transparent;
+      border: none;
+      font-size: 20px;
       cursor: pointer;
-      margin-top: 15px;
+      color: #d9534f;
     }
-    #saveEditBtn {
+    #addExchangeRateBtn {
+      padding: 8px 12px;
       background: linear-gradient(45deg, #a8e6cf, #dcedc1);
-      color: #333;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      cursor: pointer;
+      align-self: start;
     }
-    #cancelEditBtn {
-      background: linear-gradient(45deg, #cfd8dc, #b0bec5);
-      color: #333;
-      margin-left: 10px;
-    }
-    
     @media (max-width: 768px) {
       #container { flex-direction: column; }
-      #sidebar { width: 100%; border-right: none; border-bottom: var(--input-border); }
+      #sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e0e0e0; }
+      .expense-inputs { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -427,38 +467,56 @@
   <div id="container">
     <!-- 좌측 사이드바 -->
     <div id="sidebar">
-      <!-- 참가자 관리 영역 -->
-      <div id="participantSection">
-        <h2>참가자 관리</h2>
-        <input type="text" id="participantNameInput" placeholder="이름 입력 (예: 민찬)">
-        <button id="addParticipantBtn">참가자 추가</button>
-        <ul id="participantList"></ul>
+      <div id="participantContainer">
+        <div id="participantSection">
+          <h2>참가자 관리</h2>
+          <input type="text" id="participantNameInput" placeholder="이름 입력 (예: 민찬)">
+          <button id="addParticipantBtn">참가자 추가</button>
+          <ul id="participantList"></ul>
+        </div>
       </div>
-      <!-- 글로벌 컨트롤 영역 -->
       <div id="globalControls">
-        <select id="currencySelect"></select>
         <button id="copyReportBtn">정산서 복사</button>
         <button id="exportDataBtn">데이터 내보내기</button>
         <button id="resetDataBtn">데이터 초기화</button>
-        <button id="toggleDarkModeBtn">다크 모드</button>
+        <button id="settingsBtn">설정</button>
       </div>
     </div>
     <!-- 우측 메인 영역 -->
     <div id="main">
-      <!-- 정산 항목 추가 섹션 -->
       <section id="expenseSection">
         <h2>정산 항목 추가</h2>
         <div class="expense-inputs">
-          <input type="text" id="expenseReason" placeholder="정산 사유 (예: 밥값)">
-          <input type="number" id="expenseTotal" placeholder="총 금액 (예: 38000)" min="0">
+          <div>
+            <label for="expenseReason">정산 사유</label>
+            <input type="text" id="expenseReason" placeholder="예: 밥값">
+          </div>
+          <div>
+            <label>결제 날짜</label>
+            <div class="date-time-group">
+              <select id="expenseYear"></select>
+              <select id="expenseMonth"></select>
+              <select id="expenseDay"></select>
+            </div>
+          </div>
+          <div>
+            <label>결제 시각</label>
+            <div class="date-time-group">
+              <select id="expenseHour"></select>
+              <select id="expenseMinute"></select>
+            </div>
+          </div>
         </div>
-        <div class="expense-participants-wrapper">
+        <!-- 화폐별 금액 입력 -->
+        <div id="expenseCurrenciesContainer"></div>
+        <button id="addExpenseCurrencyBtn">화폐 추가</button>
+        <!-- 분배 영역 -->
+        <div id="expenseDistributionWrapper">
           <button id="toggleAllBtn">전체 선택</button>
-          <div id="expenseParticipantsContainer"></div>
+          <div id="expenseDistributionContainer"></div>
         </div>
         <button id="addExpenseBtn">정산 항목 추가</button>
       </section>
-      <!-- 세부 내역서 섹션 -->
       <section id="logSection">
         <h2>세부 내역서</h2>
         <div id="expenseLog"></div>
@@ -469,576 +527,779 @@
   <!-- 모달: 정산 내역 수정 -->
   <div id="editExpenseModal" class="modal">
     <div class="modal-content">
-      <span class="close-modal">&times;</span>
+      <span class="close-modal" id="closeEditModal">&times;</span>
       <h3>정산 내역 수정</h3>
       <div id="editExpenseForm">
         <label>사유:
           <input type="text" id="editReason">
         </label>
-        <label>총 금액:
-          <input type="number" id="editTotal" min="0">
+        <label>비용 사용 날짜</label>
+        <div class="date-time-group">
+          <select id="editExpenseYear"></select>
+          <select id="editExpenseMonth"></select>
+          <select id="editExpenseDay"></select>
+        </div>
+        <label>비용 사용 시각 (24시간제)</label>
+        <div class="date-time-group">
+          <select id="editExpenseHour"></select>
+          <select id="editExpenseMinute"></select>
+        </div>
+        <div id="editExpenseCurrenciesContainer"></div>
+        <button id="addEditExpenseCurrencyBtn">화폐 추가</button>
+        <div id="editDistributionWrapper">
+          <button id="editToggleAllBtn">전체 선택</button>
+          <div id="editDistributionContainer"></div>
+        </div>
+        <button id="saveEditExpenseBtn">저장</button>
+        <button id="cancelEditExpenseBtn">취소</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 모달: 설정 -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeSettingsModal">&times;</span>
+      <h3>설정</h3>
+      <div id="settingsForm">
+        <label>
+          정산서 출력 방식:
+          <select id="reportModeSelect">
+            <option value="individual">통화별 금액만 표시</option>
+            <option value="unified">통합 금액(환산)도 표시</option>
+          </select>
         </label>
-        <div id="editDistribution"></div>
-        <button id="saveEditBtn">저장</button>
-        <button id="cancelEditBtn">취소</button>
+        <div id="unifiedSettings" style="display:none;">
+          <label>
+            기준 통화:
+            <select id="baseCurrencySelect"></select>
+          </label>
+          <div id="exchangeRatesContainer"></div>
+          <button id="addExchangeRateBtn">환율 추가</button>
+        </div>
+        <button id="saveSettingsBtn">저장</button>
+        <button id="cancelSettingsBtn">취소</button>
       </div>
     </div>
   </div>
   
   <script>
-    /***********************************
-     * 통화 선택 옵션 채우기
-    ***********************************/
-    const currencyList = [
-      { code: "KRW", symbol: "₩", name: "한국 원", placement: "after" },
-      { code: "USD", symbol: "$", name: "미국 달러", placement: "before" },
-      { code: "PHP", symbol: "₱", name: "필리핀 페소", placement: "before" },
-      { code: "JPY", symbol: "¥", name: "일본 엔", placement: "before" },
-      { code: "AUD", symbol: "A$", name: "호주 달러", placement: "before" },
-      { code: "BRL", symbol: "R$", name: "브라질 레알", placement: "before" },
-      { code: "CAD", symbol: "C$", name: "캐나다 달러", placement: "before" },
-      { code: "CHF", symbol: "CHF", name: "스위스 프랑", placement: "before" },
-      { code: "CNY", symbol: "¥", name: "중국 위안", placement: "before" },
-      { code: "DKK", symbol: "kr", name: "덴마크 크로네", placement: "after" },
-      { code: "EUR", symbol: "€", name: "유로", placement: "before" },
-      { code: "GBP", symbol: "£", name: "영국 파운드", placement: "before" },
-      { code: "HKD", symbol: "HK$", name: "홍콩 달러", placement: "before" },
-      { code: "INR", symbol: "₹", name: "인도 루피", placement: "before" },
-      { code: "IDR", symbol: "Rp", name: "인도네시아 루피아", placement: "before" },
-      { code: "MXN", symbol: "$", name: "멕시코 페소", placement: "before" },
-      { code: "NOK", symbol: "kr", name: "노르웨이 크로네", placement: "after" },
-      { code: "NZD", symbol: "NZ$", name: "뉴질랜드 달러", placement: "before" },
-      { code: "RUB", symbol: "₽", name: "러시아 루블", placement: "after" },
-      { code: "SEK", symbol: "kr", name: "스웨덴 크로나", placement: "after" },
-      { code: "SGD", symbol: "S$", name: "싱가포르 달러", placement: "before" },
-      { code: "THB", symbol: "฿", name: "태국 바트", placement: "before" },
-      { code: "TRY", symbol: "₺", name: "터키 리라", placement: "before" },
-      { code: "ZAR", symbol: "R", name: "남아프리카 랜드", placement: "before" }
-    ];
-    const uniqueCurrencies = [];
-    currencyList.forEach(c => { if (!uniqueCurrencies.find(u => u.code === c.code)) uniqueCurrencies.push(c); });
-    const priorityCodes = ["KRW", "USD", "PHP", "JPY"];
-    const priority = uniqueCurrencies.filter(c => priorityCodes.includes(c.code));
-    const others = uniqueCurrencies.filter(c => !priorityCodes.includes(c.code));
-    others.sort((a, b) => a.code.localeCompare(b.code));
-    const sortedCurrencies = [...priority, ...others];
-    
-    let currentCurrency = sortedCurrencies[0].code;
-    function getCurrencyFormat(code) {
-      const cur = sortedCurrencies.find(c => c.code === code);
-      return cur ? { symbol: cur.symbol, placement: cur.placement } : { symbol: "", placement: "before" };
-    }
-    
-    /***********************************
-     * 데이터 영속성 관련 함수
-    ***********************************/
-    function saveData() {
-      localStorage.setItem("participants", JSON.stringify(participants));
-      localStorage.setItem("expenseLog", JSON.stringify(expenseLog));
-      localStorage.setItem("participantIdCounter", participantIdCounter);
-      localStorage.setItem("expenseIdCounter", expenseIdCounter);
-    }
-    function loadData() {
-      const pData = localStorage.getItem("participants");
-      if (pData) participants = JSON.parse(pData);
-      const eData = localStorage.getItem("expenseLog");
-      if (eData) expenseLog = JSON.parse(eData);
-      const pCounter = localStorage.getItem("participantIdCounter");
-      if (pCounter) participantIdCounter = parseInt(pCounter);
-      const eCounter = localStorage.getItem("expenseIdCounter");
-      if (eCounter) expenseIdCounter = parseInt(eCounter);
-    }
-    
-    /***********************************
-     * 헬퍼 함수 (금액 포맷)
-    ***********************************/
-    function formatIndividual(amount) {
-      const formatted = Math.floor(amount).toLocaleString();
-      const fmt = getCurrencyFormat(currentCurrency);
-      return fmt.placement === "before" ? fmt.symbol + formatted : formatted + fmt.symbol;
-    }
-    function formatTotal(amount) {
-      const formatted = Math.floor(amount).toLocaleString();
-      const fmt = getCurrencyFormat(currentCurrency);
-      return fmt.placement === "before" ? fmt.symbol + formatted : formatted + fmt.symbol;
-    }
-    
-    /***********************************
-     * 전역 변수 및 데이터 모델
-    ***********************************/
-    let participants = [];
-    let expenseLog = [];
-    let participantIdCounter = 0;
-    let expenseIdCounter = 0;
-    let allSelected = false;
-    let editingExpenseId = null;
-    
-    /***********************************
-     * DOM 요소 캐싱
-    ***********************************/
-    const participantNameInput = document.getElementById("participantNameInput");
-    const addParticipantBtn = document.getElementById("addParticipantBtn");
-    const participantListEl = document.getElementById("participantList");
-    const currencySelect = document.getElementById("currencySelect");
-    
-    const expenseReasonInput = document.getElementById("expenseReason");
-    const expenseTotalInput = document.getElementById("expenseTotal");
-    const toggleAllBtn = document.getElementById("toggleAllBtn");
-    const expenseParticipantsContainer = document.getElementById("expenseParticipantsContainer");
-    const addExpenseBtn = document.getElementById("addExpenseBtn");
-    
-    const expenseLogEl = document.getElementById("expenseLog");
-    const copyReportBtn = document.getElementById("copyReportBtn");
-    const exportDataBtn = document.getElementById("exportDataBtn");
-    const resetDataBtn = document.getElementById("resetDataBtn");
-    const toggleDarkModeBtn = document.getElementById("toggleDarkModeBtn");
-    
-    const editExpenseModal = document.getElementById("editExpenseModal");
-    const closeModalBtn = document.querySelector(".close-modal");
-    const editReasonInput = document.getElementById("editReason");
-    const editTotalInput = document.getElementById("editTotal");
-    const editDistributionEl = document.getElementById("editDistribution");
-    const saveEditBtn = document.getElementById("saveEditBtn");
-    const cancelEditBtn = document.getElementById("cancelEditBtn");
-    
-    /***********************************
-     * 통화 선택 옵션 채우기
-    ***********************************/
-    function populateCurrencySelect() {
-      currencySelect.innerHTML = "";
-      sortedCurrencies.forEach(c => {
-        const option = document.createElement("option");
-        option.value = c.code;
-        option.textContent = `${c.code} (${c.name})`;
-        currencySelect.appendChild(option);
-      });
-      currencySelect.value = currentCurrency;
-    }
-    populateCurrencySelect();
-    
-    /***********************************
-     * 참가자 관리 함수
-    ***********************************/
-    function addParticipant(name) {
-      const participant = {
-        id: participantIdCounter++,
-        name: name,
-        total: 0
-      };
-      participants.push(participant);
-      updateParticipantList();
-      updateExpenseParticipants();
-      updateTotalDisplay();
-      saveData();
-      // 입력 필드 자동 클리어
-      participantNameInput.value = "";
-    }
-    function removeParticipant(id) {
-      participants = participants.filter(p => p.id !== id);
-      updateParticipantList();
-      updateExpenseParticipants();
-      recalcParticipantsTotals();
-      updateExpenseLog();
-      updateTotalDisplay();
-      saveData();
-    }
-    function updateParticipantList() {
-      participantListEl.innerHTML = "";
-      participants.forEach(p => {
-        const li = document.createElement("li");
-        li.innerHTML = `<span>${p.name} (<strong>${formatTotal(p.total)}</strong>)</span>
-                        <button data-id="${p.id}">&times;</button>`;
-        li.querySelector("button").addEventListener("click", function() {
-          removeParticipant(parseInt(this.getAttribute("data-id")));
+    document.addEventListener("DOMContentLoaded", function() {
+      /* 전역 변수 및 데이터 모델 */
+      let participants = [];
+      let expenseLog = [];
+      let participantIdCounter = 0;
+      let expenseIdCounter = 0;
+      let allSelected = false;
+      let editingExpenseId = null;
+      let settings = { reportMode: "individual", baseCurrency: "KRW", exchangeRates: {} };
+
+      /* 통화 목록 및 헬퍼 함수 */
+      const currencyList = [
+        { code: "KRW", symbol: "₩", name: "한국 원", placement: "after" },
+        { code: "USD", symbol: "$", name: "미국 달러", placement: "before" },
+        { code: "PHP", symbol: "₱", name: "필리핀 페소", placement: "before" },
+        { code: "JPY", symbol: "¥", name: "일본 엔", placement: "before" },
+        { code: "AUD", symbol: "A$", name: "호주 달러", placement: "before" },
+        { code: "BRL", symbol: "R$", name: "브라질 레알", placement: "before" },
+        { code: "CAD", symbol: "C$", name: "캐나다 달러", placement: "before" },
+        { code: "CHF", symbol: "CHF", name: "스위스 프랑", placement: "before" },
+        { code: "CNY", symbol: "¥", name: "중국 위안", placement: "before" },
+        { code: "DKK", symbol: "kr", name: "덴마크 크로네", placement: "after" },
+        { code: "EUR", symbol: "€", name: "유로", placement: "before" },
+        { code: "GBP", symbol: "£", name: "영국 파운드", placement: "before" },
+        { code: "HKD", symbol: "HK$", name: "홍콩 달러", placement: "before" },
+        { code: "INR", symbol: "₹", name: "인도 루피", placement: "before" },
+        { code: "IDR", symbol: "Rp", name: "인도네시아 루피아", placement: "before" },
+        { code: "MXN", symbol: "$", name: "멕시코 페소", placement: "before" },
+        { code: "NOK", symbol: "kr", name: "노르웨이 크로네", placement: "after" },
+        { code: "NZD", symbol: "NZ$", name: "뉴질랜드 달러", placement: "before" },
+        { code: "RUB", symbol: "₽", name: "러시아 루블", placement: "after" },
+        { code: "SEK", symbol: "kr", name: "스웨덴 크로나", placement: "after" },
+        { code: "SGD", symbol: "S$", name: "싱가포르 달러", placement: "before" },
+        { code: "THB", symbol: "฿", name: "태국 바트", placement: "before" },
+        { code: "TRY", symbol: "₺", name: "터키 리라", placement: "before" },
+        { code: "ZAR", symbol: "R", name: "남아프리카 랜드", placement: "before" }
+      ];
+      const uniqueCurrencies = [];
+      currencyList.forEach(c => { if (!uniqueCurrencies.find(u => u.code === c.code)) uniqueCurrencies.push(c); });
+      const priorityCodes = ["KRW", "USD", "PHP", "JPY"];
+      const priority = uniqueCurrencies.filter(c => priorityCodes.includes(c.code));
+      const others = uniqueCurrencies.filter(c => !priorityCodes.includes(c.code));
+      others.sort((a, b) => a.code.localeCompare(b.code));
+      const sortedCurrencies = [...priority, ...others];
+
+      function getCurrencyFormat(code) {
+        const cur = sortedCurrencies.find(c => c.code === code);
+        return cur ? { symbol: cur.symbol, placement: cur.placement } : { symbol: "", placement: "before" };
+      }
+      function formatAmount(amount, code) {
+        const formatted = Math.floor(amount).toLocaleString();
+        const fmt = getCurrencyFormat(code);
+        return fmt.placement === "before" ? fmt.symbol + formatted : formatted + fmt.symbol;
+      }
+
+      /* 데이터 영속성 */
+      function saveData() {
+        localStorage.setItem("participants", JSON.stringify(participants));
+        localStorage.setItem("expenseLog", JSON.stringify(expenseLog));
+        localStorage.setItem("participantIdCounter", participantIdCounter);
+        localStorage.setItem("expenseIdCounter", expenseIdCounter);
+        localStorage.setItem("settings", JSON.stringify(settings));
+      }
+      function loadData() {
+        const pData = localStorage.getItem("participants");
+        if (pData) participants = JSON.parse(pData);
+        const eData = localStorage.getItem("expenseLog");
+        if (eData) expenseLog = JSON.parse(eData);
+        const pCounter = localStorage.getItem("participantIdCounter");
+        if (pCounter) participantIdCounter = parseInt(pCounter);
+        const eCounter = localStorage.getItem("expenseIdCounter");
+        if (eCounter) expenseIdCounter = parseInt(eCounter);
+        const sData = localStorage.getItem("settings");
+        if (sData) settings = JSON.parse(sData);
+      }
+
+      /* 날짜/시간 드롭다운 생성 (현재년도 기준 ±5년) */
+      function populateDateTimeSelectors(prefix) {
+        const now = new Date();
+        let currentYear = now.getFullYear();
+        const yearSelect = document.getElementById(prefix + "Year");
+        yearSelect.innerHTML = "";
+        for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+          let opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          yearSelect.appendChild(opt);
+        }
+        const monthSelect = document.getElementById(prefix + "Month");
+        monthSelect.innerHTML = "";
+        for (let m = 1; m <= 12; m++) {
+          let opt = document.createElement("option");
+          opt.value = m.toString().padStart(2, '0');
+          opt.textContent = m.toString().padStart(2, '0');
+          monthSelect.appendChild(opt);
+        }
+        const daySelect = document.getElementById(prefix + "Day");
+        daySelect.innerHTML = "";
+        for (let d = 1; d <= 31; d++) {
+          let opt = document.createElement("option");
+          opt.value = d.toString().padStart(2, '0');
+          opt.textContent = d.toString().padStart(2, '0');
+          daySelect.appendChild(opt);
+        }
+        const hourSelect = document.getElementById(prefix + "Hour");
+        hourSelect.innerHTML = "";
+        for (let h = 0; h < 24; h++) {
+          let opt = document.createElement("option");
+          opt.value = h.toString().padStart(2, '0');
+          opt.textContent = h.toString().padStart(2, '0');
+          hourSelect.appendChild(opt);
+        }
+        const minuteSelect = document.getElementById(prefix + "Minute");
+        minuteSelect.innerHTML = "";
+        for (let i = 0; i < 60; i++) {
+          let opt = document.createElement("option");
+          opt.value = i.toString().padStart(2, '0');
+          opt.textContent = i.toString().padStart(2, '0');
+          minuteSelect.appendChild(opt);
+        }
+        yearSelect.value = currentYear;
+        monthSelect.value = (now.getMonth() + 1).toString().padStart(2, '0');
+        daySelect.value = now.getDate().toString().padStart(2, '0');
+        hourSelect.value = now.getHours().toString().padStart(2, '0');
+        minuteSelect.value = now.getMinutes().toString().padStart(2, '0');
+      }
+      populateDateTimeSelectors("expense");
+      populateDateTimeSelectors("editExpense");
+
+      /* 기준 통화 select 옵션 채우기 */
+      function populateBaseCurrencySelect() {
+        const baseSelect = document.getElementById("baseCurrencySelect");
+        baseSelect.innerHTML = "";
+        sortedCurrencies.forEach(c => {
+          let opt = document.createElement("option");
+          opt.value = c.code;
+          opt.textContent = `${c.code} (${c.name})`;
+          baseSelect.appendChild(opt);
         });
-        participantListEl.appendChild(li);
-      });
-    }
-    
-    /***********************************
-     * 정산 항목 추가 영역 관련
-    ***********************************/
-    function updateExpenseParticipants() {
-      expenseParticipantsContainer.innerHTML = "";
-      participants.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "expense-row";
-        div.innerHTML = `
-          <label>
-            <input type="checkbox" class="expense-check" value="${p.id}"> ${p.name}
-          </label>
-          <input type="number" class="manual-override" placeholder="추가 금액 (예: 8000)" value="" step="1">
-          <span class="computed-share">0${getCurrencyFormat(currentCurrency).symbol}</span>
-        `;
-        const checkbox = div.querySelector(".expense-check");
-        const manualInput = div.querySelector(".manual-override");
-        checkbox.addEventListener("change", updateComputedShares);
-        manualInput.addEventListener("input", updateComputedShares);
-        expenseParticipantsContainer.appendChild(div);
-      });
-    }
-    toggleAllBtn.addEventListener("click", () => {
-      allSelected = !allSelected;
-      const checkboxes = document.querySelectorAll(".expense-check");
-      checkboxes.forEach(cb => cb.checked = allSelected);
-      toggleAllBtn.textContent = allSelected ? "전체 해제" : "전체 선택";
-      updateComputedShares();
-    });
-    expenseTotalInput.addEventListener("input", updateComputedShares);
-    function updateComputedShares() {
-      const totalValue = parseFloat(expenseTotalInput.value) || 0;
-      const rows = document.querySelectorAll(".expense-row");
-      let selectedRows = [];
-      rows.forEach(row => {
-        const cb = row.querySelector(".expense-check");
-        if(cb.checked) selectedRows.push(row);
-      });
-      let manualSum = 0;
-      selectedRows.forEach(row => {
-        const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
-        manualSum += manualVal;
-      });
-      let remainder = totalValue - manualSum;
-      if(remainder < 0) remainder = 0;
-      const n = selectedRows.length;
-      if(n > 0) {
-         const share = remainder / n;
-         selectedRows.forEach(row => {
-           const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
-           const computed = share + manualVal;
-           row.querySelector(".computed-share").textContent = formatIndividual(computed);
-         });
+        if (!settings.baseCurrency || !baseSelect.querySelector(`option[value="${settings.baseCurrency}"]`)) {
+          settings.baseCurrency = "KRW";
+        }
+        baseSelect.value = settings.baseCurrency;
       }
-      rows.forEach(row => {
-         const cb = row.querySelector(".expense-check");
-         if(!cb.checked) {
-           row.querySelector(".computed-share").textContent = "0" + getCurrencyFormat(currentCurrency).symbol;
-         }
-      });
-    }
-    
-    /***********************************
-     * 정산 항목 추가 (로그 기록 및 참가자 총액 업데이트)
-    ***********************************/
-    addExpenseBtn.addEventListener("click", () => {
-      const reason = expenseReasonInput.value.trim();
-      const totalExpense = parseFloat(expenseTotalInput.value);
-      if (!reason || isNaN(totalExpense) || totalExpense <= 0) {
-        alert("정산 사유와 올바른 총 금액을 입력하세요.");
-        return;
-      }
-      const rows = document.querySelectorAll(".expense-row");
-      let distribution = [];
-      let selectedRows = [];
-      rows.forEach(row => {
-        const cb = row.querySelector(".expense-check");
-        if(cb.checked) selectedRows.push(row);
-      });
-      if(selectedRows.length === 0) {
-        alert("정산에 참여할 참가자를 선택하세요.");
-        return;
-      }
-      let manualSum = 0;
-      selectedRows.forEach(row => {
-        const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
-        manualSum += manualVal;
-      });
-      let remainder = totalExpense - manualSum;
-      if(remainder < 0) remainder = 0;
-      const n = selectedRows.length;
-      const share = n > 0 ? (remainder / n) : 0;
-      selectedRows.forEach(row => {
-        const participantId = parseInt(row.querySelector(".expense-check").value);
-        const manualVal = parseFloat(row.querySelector(".manual-override").value) || 0;
-        const computed = share + manualVal;
-        distribution.push({
-          participantId,
-          name: participants.find(p => p.id === participantId).name,
-          manual: manualVal,
-          computed: computed
+
+      /* 참가자 목록 업데이트 */
+      function updateParticipantList() {
+        const list = document.getElementById("participantList");
+        list.innerHTML = "";
+        participants.forEach(p => {
+          let totalsStr = "";
+          if(settings.reportMode === "unified"){
+            let unified = 0;
+            for (const cur in p.totals) {
+              totalsStr += `   - ${cur}: ${formatAmount(p.totals[cur], cur)}\n`;
+              let rate = settings.exchangeRates[cur] || 1;
+              unified += p.totals[cur] * rate;
+            }
+            if (totalsStr.trim() === "") totalsStr = "0";
+            var header = `${p.name}(총액: ${formatAmount(unified, settings.baseCurrency)})\n` + totalsStr;
+          } else {
+            for (const cur in p.totals) {
+              totalsStr += `   - ${cur}: ${formatAmount(p.totals[cur], cur)}\n`;
+            }
+            if (totalsStr.trim() === "") totalsStr = "0";
+            var header = `${p.name}\n` + totalsStr;
+          }
+          const li = document.createElement("li");
+          li.innerHTML = `<div class="p-header"><pre>${header}</pre></div>
+                          <button data-id="${p.id}">&times;</button>`;
+          li.querySelector("button").addEventListener("click", function() {
+            participants = participants.filter(item => item.id !== parseInt(this.getAttribute("data-id")));
+            updateParticipantList();
+            updateExpenseDistribution();
+            recalcTotals();
+            saveData();
+          });
+          list.appendChild(li);
         });
+      }
+
+      /* 정산 항목 추가 – 화폐별 금액 입력 행 추가 (한 번에 1행씩 추가) */
+      function addExpenseCurrencyRow(currency = sortedCurrencies[0].code, amount = "") {
+        const row = document.createElement("div");
+        row.className = "expense-currency-row";
+        row.dataset.rowId = 'exr-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        const select = document.createElement("select");
+        sortedCurrencies.forEach(c => {
+          let opt = document.createElement("option");
+          opt.value = c.code;
+          opt.textContent = c.code;
+          select.appendChild(opt);
+        });
+        select.value = currency;
+        select.addEventListener("change", updateExpenseDistribution);
+        const inp = document.createElement("input");
+        inp.type = "number";
+        inp.min = "0";
+        inp.placeholder = "금액 (예: 38000)";
+        inp.value = amount;
+        inp.addEventListener("input", updateExpenseDistribution);
+        const btn = document.createElement("button");
+        btn.textContent = "×";
+        btn.className = "remove-currency";
+        btn.addEventListener("click", () => { row.remove(); updateExpenseDistribution(); });
+        row.appendChild(select);
+        row.appendChild(inp);
+        row.appendChild(btn);
+        document.getElementById("expenseCurrenciesContainer").appendChild(row);
+        updateExpenseDistribution();
+      }
+      addExpenseCurrencyRow();
+      document.getElementById("addExpenseCurrencyBtn").addEventListener("click", () => { addExpenseCurrencyRow(); });
+
+      /* 분배 영역 업데이트 */
+      function updateExpenseDistribution() {
+        const container = document.getElementById("expenseDistributionContainer");
+        container.innerHTML = "";
+        participants.forEach(p => {
+          const row = document.createElement("div");
+          row.className = "distribution-row";
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.value = p.id;
+          cb.className = "distribution-check";
+          cb.addEventListener("change", updateComputedShares);
+          const span = document.createElement("span");
+          span.className = "participant-name";
+          span.textContent = p.name;
+          row.appendChild(cb);
+          row.appendChild(span);
+          const currRows = document.querySelectorAll("#expenseCurrenciesContainer .expense-currency-row");
+          currRows.forEach(cr => {
+            const group = document.createElement("div");
+            group.className = "currency-group";
+            group.dataset.rowId = cr.dataset.rowId;
+            const curCode = cr.querySelector("select").value;
+            const label = document.createElement("div");
+            label.className = "group-label";
+            label.textContent = curCode;
+            const manual = document.createElement("input");
+            manual.type = "number";
+            manual.min = "0";
+            manual.placeholder = "추가 금액";
+            manual.className = "manual-override";
+            manual.dataset.rowId = cr.dataset.rowId;
+            manual.addEventListener("input", updateComputedShares);
+            const comp = document.createElement("span");
+            comp.className = "computed-share";
+            comp.dataset.rowId = cr.dataset.rowId;
+            comp.textContent = formatAmount(0, curCode);
+            group.appendChild(label);
+            group.appendChild(manual);
+            group.appendChild(comp);
+            row.appendChild(group);
+          });
+          container.appendChild(row);
+        });
+      }
+      document.getElementById("toggleAllBtn").addEventListener("click", () => {
+        allSelected = !allSelected;
+        document.querySelectorAll(".distribution-check").forEach(cb => cb.checked = allSelected);
+        document.getElementById("toggleAllBtn").textContent = allSelected ? "전체 해제" : "전체 선택";
+        updateComputedShares();
       });
-      const expenseEntry = {
-        id: expenseIdCounter++,
-        time: new Date().toLocaleString(),
-        reason: reason,
-        total: totalExpense,
-        distribution: distribution
-      };
-      expenseLog.push(expenseEntry);
-      recalcParticipantsTotals();
-      updateExpenseLog();
-      updateParticipantList();
-      updateTotalDisplay();
-      // 입력 필드 클리어
-      expenseReasonInput.value = "";
-      expenseTotalInput.value = "";
-      updateComputedShares();
-      const allRows = document.querySelectorAll(".expense-row");
-      allRows.forEach(row => {
-        row.querySelector(".expense-check").checked = false;
-        row.querySelector(".manual-override").value = "";
-        row.querySelector(".computed-share").textContent = "0" + getCurrencyFormat(currentCurrency).symbol;
+
+      /* computed share 재계산 */
+      function updateComputedShares() {
+        const currRows = document.querySelectorAll("#expenseCurrenciesContainer .expense-currency-row");
+        currRows.forEach(cr => {
+          const rowId = cr.dataset.rowId;
+          const curCode = cr.querySelector("select").value;
+          const total = parseFloat(cr.querySelector("input").value) || 0;
+          const distRows = document.querySelectorAll("#expenseDistributionContainer .distribution-row");
+          let selected = [];
+          distRows.forEach(dr => { if (dr.querySelector("input.distribution-check").checked) selected.push(dr); });
+          let manualSum = 0;
+          selected.forEach(dr => {
+            const val = parseFloat(dr.querySelector(`input.manual-override[data-row-id="${rowId}"]`).value) || 0;
+            manualSum += val;
+          });
+          let remainder = total - manualSum;
+          if (remainder < 0) remainder = 0;
+          let share = selected.length > 0 ? remainder / selected.length : 0;
+          selected.forEach(dr => {
+            const val = parseFloat(dr.querySelector(`input.manual-override[data-row-id="${rowId}"]`).value) || 0;
+            let compVal = share + val;
+            dr.querySelector(`span.computed-share[data-row-id="${rowId}"]`).textContent = formatAmount(compVal, curCode);
+          });
+          distRows.forEach(dr => {
+            if (!dr.querySelector("input.distribution-check").checked) {
+              dr.querySelector(`span.computed-share[data-row-id="${rowId}"]`).textContent = formatAmount(0, curCode);
+            }
+          });
+        });
+      }
+
+      /* 참가자 추가 버튼 */
+      document.getElementById("addParticipantBtn").addEventListener("click", () => {
+        const nameInput = document.getElementById("participantNameInput");
+        const name = nameInput.value.trim();
+        if (!name) {
+          alert("참가자 이름을 입력하세요.");
+          return;
+        }
+        participants.push({ id: participantIdCounter++, name: name, totals: {} });
+        updateParticipantList();
+        updateExpenseDistribution();
+        recalcTotals();
+        saveData();
+        nameInput.value = "";
       });
-      allSelected = false;
-      toggleAllBtn.textContent = "전체 선택";
-      saveData();
-    });
-    
-    /***********************************
-     * 세부 내역서 (로그) 및 참가자 총액 재계산
-    ***********************************/
-    function updateExpenseLog() {
-      expenseLogEl.innerHTML = "";
-      expenseLog.slice().reverse().forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "log-entry";
-        div.innerHTML = `
-          <header>[${entry.time}] - ${entry.reason} (총 ${formatTotal(entry.total)})</header>
-          <div class="log-details">
-            ${entry.distribution.map(d => `<span>${d.name}: ${formatIndividual(d.computed)}${d.manual > 0 ? " (+" + formatIndividual(d.manual) + ")" : ""}</span>`).join("")}
-          </div>
-          <div class="log-actions">
-            <button class="edit-btn" data-id="${entry.id}">수정</button>
-            <button class="delete-btn" data-id="${entry.id}">삭제</button>
-          </div>
-        `;
-        div.querySelector(".delete-btn").addEventListener("click", function() {
-          const id = parseInt(this.getAttribute("data-id"));
-          if(confirm("정말로 이 정산 내역을 삭제하시겠습니까?")) {
-            deleteExpense(id);
+
+      /* 정산 항목 추가 최종 처리 */
+      document.getElementById("addExpenseBtn").addEventListener("click", () => {
+        const reason = document.getElementById("expenseReason").value.trim();
+        if (!reason) { alert("정산 사유를 입력하세요."); return; }
+        const year = document.getElementById("expenseYear").value;
+        const month = document.getElementById("expenseMonth").value;
+        const day = document.getElementById("expenseDay").value;
+        const hour = document.getElementById("expenseHour").value;
+        const minute = document.getElementById("expenseMinute").value;
+        if (!year || !month || !day || !hour || !minute) { alert("비용 사용 날짜와 시각을 모두 선택하세요."); return; }
+        const expenseTime = `${year}-${month}-${day} ${hour}:${minute}`;
+        const currRows = document.querySelectorAll("#expenseCurrenciesContainer .expense-currency-row");
+        let currencies = [];
+        currRows.forEach(cr => {
+          const cur = cr.querySelector("select").value;
+          const amt = parseFloat(cr.querySelector("input").value);
+          if (!isNaN(amt) && amt > 0) { currencies.push({ currency: cur, amount: amt }); }
+        });
+        if (currencies.length === 0) { alert("적어도 하나의 금액(양수)을 입력하세요."); return; }
+        let distribution = [];
+        document.querySelectorAll("#expenseDistributionContainer .distribution-row").forEach(dr => {
+          if (dr.querySelector("input.distribution-check").checked) {
+            const pid = parseInt(dr.querySelector("input.distribution-check").value);
+            let comp = {}, man = {};
+            dr.querySelectorAll(".currency-group").forEach(group => {
+              const cur = group.querySelector(".group-label").textContent;
+              const compVal = parseFloat(group.querySelector("span.computed-share").textContent.replace(/\D/g,'')) || 0;
+              const manVal = parseFloat(group.querySelector("input.manual-override").value) || 0;
+              comp[cur] = compVal;
+              man[cur] = manVal;
+            });
+            distribution.push({ participantId: pid, name: participants.find(p => p.id === pid).name, computed: comp, manual: man });
           }
         });
-        div.querySelector(".edit-btn").addEventListener("click", function() {
-          const id = parseInt(this.getAttribute("data-id"));
-          openEditModal(id);
-        });
-        expenseLogEl.appendChild(div);
-      });
-    }
-    function deleteExpense(expenseId) {
-      const index = expenseLog.findIndex(entry => entry.id === expenseId);
-      if(index !== -1) {
-        expenseLog.splice(index, 1);
-        recalcParticipantsTotals();
+        if (distribution.length === 0) { alert("정산에 참여할 참가자를 선택하세요."); return; }
+        let entry = {
+          id: expenseIdCounter++,
+          time: expenseTime,
+          reason: reason,
+          currencies: currencies,
+          distribution: distribution
+        };
+        expenseLog.push(entry);
+        recalcTotals();
         updateExpenseLog();
         updateParticipantList();
-        updateTotalDisplay();
+        document.getElementById("expenseReason").value = "";
+        populateDateTimeSelectors("expense");
+        document.getElementById("expenseCurrenciesContainer").innerHTML = "";
+        addExpenseCurrencyRow();
+        updateExpenseDistribution();
+        allSelected = false;
+        document.getElementById("toggleAllBtn").textContent = "전체 선택";
+        saveData();
+      });
+
+      function recalcTotals() {
+        participants.forEach(p => p.totals = {});
+        expenseLog.forEach(entry => {
+          entry.distribution.forEach(d => {
+            for (const cur in d.computed) {
+              const p = participants.find(p => p.id === d.participantId);
+              if (p) p.totals[cur] = (p.totals[cur] || 0) + d.computed[cur];
+            }
+          });
+        });
+      }
+
+      function updateExpenseLog() {
+        const logEl = document.getElementById("expenseLog");
+        logEl.innerHTML = "";
+        expenseLog.slice().reverse().forEach(entry => {
+          const div = document.createElement("div");
+          div.className = "log-entry";
+          const header = document.createElement("header");
+          header.textContent = `${entry.time} ${entry.reason} ` +
+            entry.currencies.map(c => `${c.currency}: ${formatAmount(c.amount, c.currency)}`).join(" ");
+          div.appendChild(header);
+          let details = "";
+          entry.distribution.forEach(d => {
+            let line = `${d.name}:`;
+            for (const cur in d.computed) {
+              line += ` ${cur}: ${formatAmount(d.computed[cur], cur)}`;
+            }
+            details += line + "\n";
+          });
+          const detailDiv = document.createElement("div");
+          detailDiv.className = "log-details";
+          detailDiv.innerHTML = `<pre>${details}</pre>`;
+          div.appendChild(detailDiv);
+          const actDiv = document.createElement("div");
+          actDiv.className = "log-actions";
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "수정";
+          editBtn.dataset.id = entry.id;
+          editBtn.addEventListener("click", () => { openEditModal(entry.id); });
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "삭제";
+          delBtn.dataset.id = entry.id;
+          delBtn.addEventListener("click", () => { if(confirm("이 항목을 삭제하시겠습니까?")) { deleteExpense(entry.id); } });
+          actDiv.appendChild(editBtn);
+          actDiv.appendChild(delBtn);
+          div.appendChild(actDiv);
+          logEl.appendChild(div);
+        });
+      }
+
+      function deleteExpense(id) {
+        expenseLog = expenseLog.filter(e => e.id !== id);
+        recalcTotals();
+        updateExpenseLog();
+        updateParticipantList();
         saveData();
       }
-    }
-    function recalcParticipantsTotals() {
-      participants.forEach(p => p.total = 0);
-      expenseLog.forEach(entry => {
-        entry.distribution.forEach(d => {
-          const p = participants.find(p => p.id === d.participantId);
-          if(p) p.total += d.computed;
-        });
-      });
-    }
-    
-    /***********************************
-     * 정산서 복사 기능
-    ***********************************/
-    copyReportBtn.addEventListener("click", () => {
-      let report = "";
-      participants.forEach(p => {
-        report += `[${p.name}] 총액: ${formatTotal(p.total)}\n`;
-        expenseLog.forEach(entry => {
-          const dist = entry.distribution.find(d => d.participantId === p.id);
-          if(dist) {
-            report += `${entry.time} - ${entry.reason} - ${formatIndividual(dist.computed)}\n`;
+
+      document.getElementById("copyReportBtn").addEventListener("click", () => {
+        let rep = "";
+        participants.forEach(p => {
+          rep += "--------------------------\n";
+          let unified = 0;
+          if(settings.reportMode === "unified"){
+            for (const cur in p.totals) {
+              let rate = settings.exchangeRates[cur] || 1;
+              unified += p.totals[cur] * rate;
+            }
+            rep += `${p.name}(총액: ${formatAmount(unified, settings.baseCurrency)})\n`;
+          } else {
+            rep += `${p.name}\n`;
           }
+          for (const cur in p.totals) {
+            rep += `   - ${cur}: ${formatAmount(p.totals[cur], cur)}\n`;
+          }
+          rep += "\n";
+          expenseLog.forEach(entry => {
+            const d = entry.distribution.find(item => item.participantId === p.id);
+            if (d) {
+              let dt = entry.time;
+              let line = `${dt} ${entry.reason}`;
+              for (const cur in d.computed) {
+                line += ` ${cur}: ${formatAmount(d.computed[cur], cur)}`;
+              }
+              rep += line + "\n";
+            }
+          });
+          rep += "--------------------------\n";
         });
-        report += "\n";
+        copyToClipboard(rep);
+        alert("정산서가 클립보드에 복사되었습니다.");
       });
-      copyToClipboard(report);
-      alert("정산서가 클립보드에 복사되었습니다.");
-    });
-    function copyToClipboard(text) {
-      const temp = document.createElement("textarea");
-      temp.value = text;
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand("copy");
-      document.body.removeChild(temp);
-    }
-    
-    /***********************************
-     * 데이터 내보내기 및 초기화 기능
-    ***********************************/
-    exportDataBtn.addEventListener("click", () => {
-      const data = {
-        participants,
-        expenseLog,
-        participantIdCounter,
-        expenseIdCounter
-      };
-      const dataStr = JSON.stringify(data, null, 2);
-      const blob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "expense_data.json";
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-    resetDataBtn.addEventListener("click", () => {
-      if(confirm("정말로 모든 데이터를 초기화하시겠습니까?")) {
-        localStorage.clear();
-        location.reload();
+
+      function copyToClipboard(text) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
       }
-    });
-    
-    /***********************************
-     * 다크 모드 토글
-    ***********************************/
-    toggleDarkModeBtn.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-      toggleDarkModeBtn.textContent = document.body.classList.contains("dark-mode") ? "라이트 모드" : "다크 모드";
-    });
-    
-    /***********************************
-     * 모달 내 분담액 자동 재계산 (총 금액 및 개별 override 지원)
-    ***********************************/
-    function recalcModalDistribution() {
-      const total = parseFloat(editTotalInput.value) || 0;
-      const shareInputs = Array.from(editDistributionEl.querySelectorAll("input"));
-      let sumOverride = 0;
-      let nonOverridden = [];
-      shareInputs.forEach(input => {
-        // 만약 해당 입력에 포커스 중이면 재계산 대상에서 제외
-        if (document.activeElement === input) return;
-        if (input.dataset.override === "true") {
-          sumOverride += parseFloat(input.value) || 0;
-        } else {
-          nonOverridden.push(input);
+
+      document.getElementById("exportDataBtn").addEventListener("click", () => {
+        const data = { participants, expenseLog, participantIdCounter, expenseIdCounter, settings };
+        const str = JSON.stringify(data, null, 2);
+        const blob = new Blob([str], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "expense_data.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById("resetDataBtn").addEventListener("click", () => {
+        if (confirm("모든 데이터를 초기화하시겠습니까?")) {
+          localStorage.clear();
+          location.reload();
         }
       });
-      const remainder = total - sumOverride;
-      if (nonOverridden.length > 0) {
-        const equalShare = remainder / nonOverridden.length;
-        nonOverridden.forEach(input => {
-          input.value = Math.floor(equalShare);
-        });
-      }
-    }
-    
-    function attachModalListeners() {
-      const shareInputs = editDistributionEl.querySelectorAll("input");
-      shareInputs.forEach(input => {
-        input.addEventListener("input", () => {
-          input.dataset.override = "true";
-          recalcModalDistribution();
-        });
-        input.addEventListener("blur", () => {
-          if(input.value === "") delete input.dataset.override;
-          recalcModalDistribution();
-        });
+
+      /* 설정 모달 */
+      document.getElementById("settingsBtn").addEventListener("click", () => {
+        document.getElementById("reportModeSelect").value = settings.reportMode;
+        document.getElementById("unifiedSettings").style.display = settings.reportMode === "unified" ? "block" : "none";
+        populateBaseCurrencySelect();
+        document.getElementById("exchangeRatesContainer").innerHTML = "";
+        for (const cur in settings.exchangeRates) { addExchangeRateRow(cur, settings.exchangeRates[cur]); }
+        document.getElementById("settingsModal").style.display = "flex";
       });
-    }
-    
-    /***********************************
-     * 모달 (정산 내역 수정) 기능
-     * 총 금액 수정 시 자동 분배(포커스 아웃 시) 및 override 지원
-    ***********************************/
-    function openEditModal(expenseId) {
-      editingExpenseId = expenseId;
-      const entry = expenseLog.find(e => e.id === expenseId);
-      if (!entry) return;
-      editReasonInput.value = entry.reason;
-      editTotalInput.value = entry.total;
-      editDistributionEl.innerHTML = "";
-      entry.distribution.forEach(d => {
+      document.getElementById("closeSettingsModal").addEventListener("click", () => {
+        document.getElementById("settingsModal").style.display = "none";
+      });
+      document.getElementById("cancelSettingsBtn").addEventListener("click", () => {
+        document.getElementById("settingsModal").style.display = "none";
+      });
+      document.getElementById("reportModeSelect").addEventListener("change", () => {
+        document.getElementById("unifiedSettings").style.display = document.getElementById("reportModeSelect").value === "unified" ? "block" : "none";
+      });
+      function addExchangeRateRow(currency = sortedCurrencies[1].code, rate = "") {
         const row = document.createElement("div");
-        row.className = "edit-row";
-        row.innerHTML = `<span>${d.name}</span>
-                         <input type="number" value="${Math.floor(d.computed)}" min="0" data-participant="${d.participantId}" step="1">`;
-        editDistributionEl.appendChild(row);
-      });
-      attachModalListeners();
-      // 총 금액 수정 시 재계산 (on blur event)
-      editTotalInput.addEventListener("blur", recalcModalDistribution);
-      editExpenseModal.style.display = "flex";
-    }
-    function closeEditModal() {
-      editingExpenseId = null;
-      // 클리어 모달 내부 값 (선택 사항)
-      editReasonInput.value = "";
-      editTotalInput.value = "";
-      editDistributionEl.innerHTML = "";
-      editTotalInput.removeEventListener("blur", recalcModalDistribution);
-      editExpenseModal.style.display = "none";
-    }
-    closeModalBtn.addEventListener("click", closeEditModal);
-    cancelEditBtn.addEventListener("click", closeEditModal);
-    saveEditBtn.addEventListener("click", () => {
-      if(editingExpenseId === null) return;
-      const entry = expenseLog.find(e => e.id === editingExpenseId);
-      if (!entry) return;
-      const newReason = editReasonInput.value.trim();
-      const newTotal = parseFloat(editTotalInput.value);
-      if (!newReason || isNaN(newTotal) || newTotal <= 0) {
-        alert("올바른 사유와 총 금액을 입력하세요.");
-        return;
-      }
-      const newDistribution = [];
-      const editRows = editDistributionEl.querySelectorAll(".edit-row");
-      editRows.forEach(row => {
-        const input = row.querySelector("input");
-        const participantId = parseInt(input.getAttribute("data-participant"));
-        const computed = parseFloat(input.value) || 0;
-        newDistribution.push({
-          participantId: participantId,
-          name: participants.find(p => p.id === participantId).name,
-          manual: 0,
-          computed: computed
+        row.className = "exchange-rate-row";
+        const select = document.createElement("select");
+        sortedCurrencies.forEach(c => {
+          let opt = document.createElement("option");
+          opt.value = c.code;
+          opt.textContent = c.code;
+          select.appendChild(opt);
         });
-      });
-      entry.reason = newReason;
-      entry.total = newTotal;
-      entry.distribution = newDistribution;
-      recalcParticipantsTotals();
-      updateExpenseLog();
-      updateParticipantList();
-      updateTotalDisplay();
-      closeEditModal();
-      saveData();
-    });
-    
-    /***********************************
-     * 참가자 추가 버튼 이벤트
-    ***********************************/
-    addParticipantBtn.addEventListener("click", () => {
-      const name = participantNameInput.value.trim();
-      if (!name) {
-        alert("참가자 이름을 입력하세요.");
-        return;
+        select.value = currency;
+        const left = document.createElement("span");
+        left.textContent = "1,000";
+        const mid = document.createElement("span");
+        mid.textContent = " = ";
+        const inp = document.createElement("input");
+        inp.type = "number";
+        inp.min = "0";
+        inp.placeholder = "기준 통화 금액";
+        inp.value = rate;
+        const baseLbl = document.createElement("span");
+        baseLbl.textContent = document.getElementById("baseCurrencySelect").value;
+        const remBtn = document.createElement("button");
+        remBtn.textContent = "×";
+        remBtn.className = "remove-rate";
+        remBtn.addEventListener("click", () => { row.remove(); });
+        row.appendChild(select);
+        row.appendChild(left);
+        row.appendChild(mid);
+        row.appendChild(inp);
+        row.appendChild(baseLbl);
+        row.appendChild(remBtn);
+        document.getElementById("exchangeRatesContainer").appendChild(row);
       }
-      addParticipant(name);
-    });
-    
-    /* 통화 선택 이벤트 */
-    currencySelect.addEventListener("change", () => {
-      currentCurrency = currencySelect.value;
-      updateParticipantList();
-      updateExpenseLog();
-      updateExpenseParticipants();
-    });
-    
-    function updateTotalDisplay() {
-      const overall = participants.reduce((acc, cur) => acc + cur.total, 0);
-      // 전체 총액 바로 업데이트
-      // 예: "$123,456" 또는 "123,456₩"
-      document.getElementById("expenseTotal").placeholder = `총 금액 (예: 38000)`;
-    }
-    
-    // 초기 데이터 로드 및 UI 업데이트
-    loadData();
-    updateParticipantList();
-    updateExpenseParticipants();
-    updateExpenseLog();
-    updateTotalDisplay();
+      document.getElementById("addExchangeRateBtn").addEventListener("click", () => { addExchangeRateRow(); });
+      document.getElementById("saveSettingsBtn").addEventListener("click", () => {
+        settings.reportMode = document.getElementById("reportModeSelect").value;
+        settings.baseCurrency = document.getElementById("baseCurrencySelect").value;
+        let rates = {};
+        document.querySelectorAll(".exchange-rate-row").forEach(row => {
+          const cur = row.querySelector("select").value;
+          const val = parseFloat(row.querySelector("input").value) || 1;
+          rates[cur] = val;
+        });
+        settings.exchangeRates = rates;
+        saveData();
+        updateParticipantList();
+        updateExpenseLog();
+        document.getElementById("settingsModal").style.display = "none";
+      });
+
+      /* 편집 모달 */
+      function populateEditSelectors() { populateDateTimeSelectors("editExpense"); }
+      function openEditModal(id) {
+        editingExpenseId = id;
+        const entry = expenseLog.find(e => e.id === id);
+        if (!entry) return;
+        document.getElementById("editReason").value = entry.reason;
+        let parts = entry.time.split(" ");
+        if(parts.length >= 2) {
+          let dateParts = parts[0].split("-");
+          let timeParts = parts[1].split(":");
+          document.getElementById("editExpenseYear").value = dateParts[0];
+          document.getElementById("editExpenseMonth").value = dateParts[1];
+          document.getElementById("editExpenseDay").value = dateParts[2];
+          document.getElementById("editExpenseHour").value = timeParts[0];
+          document.getElementById("editExpenseMinute").value = timeParts[1];
+        }
+        populateEditSelectors();
+        document.getElementById("editExpenseCurrenciesContainer").innerHTML = "";
+        entry.currencies.forEach(c => { addEditExpenseCurrencyRow(c.currency, c.amount); });
+        updateEditDistribution();
+        document.querySelectorAll("#editDistributionContainer .distribution-row").forEach(dr => {
+          const pid = parseInt(dr.querySelector("input.distribution-check").value);
+          const d = entry.distribution.find(item => item.participantId === pid);
+          if (d) {
+            dr.querySelectorAll(".currency-group").forEach(group => {
+              const cur = group.querySelector(".group-label").textContent;
+              const inp = group.querySelector("input.manual-override");
+              if (d.manual[cur] !== undefined) { inp.value = d.manual[cur]; }
+            });
+          }
+        });
+        updateEditComputedShares();
+        document.getElementById("editExpenseModal").style.display = "flex";
+      }
+      function closeEditModal() {
+        editingExpenseId = null;
+        document.getElementById("editExpenseModal").style.display = "none";
+        document.getElementById("editReason").value = "";
+        document.getElementById("editExpenseCurrenciesContainer").innerHTML = "";
+        document.getElementById("editDistributionContainer").innerHTML = "";
+      }
+      document.getElementById("closeEditModal").addEventListener("click", closeEditModal);
+      document.getElementById("cancelEditExpenseBtn").addEventListener("click", closeEditModal);
+      function addEditExpenseCurrencyRow(currency, amount) {
+        const row = document.createElement("div");
+        row.className = "expense-currency-row";
+        row.dataset.rowId = 'edit-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        const select = document.createElement("select");
+        sortedCurrencies.forEach(c => {
+          let opt = document.createElement("option");
+          opt.value = c.code;
+          opt.textContent = c.code;
+          select.appendChild(opt);
+        });
+        select.value = currency;
+        select.addEventListener("change", updateEditDistribution);
+        const inp = document.createElement("input");
+        inp.type = "number";
+        inp.min = "0";
+        inp.placeholder = "금액 (예: 38000)";
+        inp.value = amount;
+        inp.addEventListener("input", updateEditDistribution);
+        const btn = document.createElement("button");
+        btn.textContent = "×";
+        btn.className = "remove-currency";
+        btn.addEventListener("click", () => { row.remove(); updateEditDistribution(); });
+        row.appendChild(select);
+        row.appendChild(inp);
+        row.appendChild(btn);
+        document.getElementById("editExpenseCurrenciesContainer").appendChild(row);
+        updateEditDistribution();
+      }
+      document.getElementById("addEditExpenseCurrencyBtn").addEventListener("click", () => { addEditExpenseCurrencyRow(sortedCurrencies[0].code, ""); });
+      function updateEditDistribution() {
+        const container = document.getElementById("editDistributionContainer");
+        container.innerHTML = "";
+        participants.forEach(p => {
+          const row = document.createElement("div");
+          row.className = "distribution-row";
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.value = p.id;
+          cb.className = "distribution-check";
+          cb.addEventListener("change", updateEditComputedShares);
+          const span = document.createElement("span");
+          span.className = "participant-name";
+          span.textContent = p.name;
+          row.appendChild(cb);
+          row.appendChild(span);
+          const currRows = document.querySelectorAll("#editExpenseCurrenciesContainer .expense-currency-row");
+          currRows.forEach(cr => {
+            const group = document.createElement("div");
+            group.className = "currency-group";
+            group.dataset.rowId = cr.dataset.rowId;
+            const curCode = cr.querySelector("select").value;
+            const label = document.createElement("div");
+            label.className = "group-label";
+            label.textContent = curCode;
+            const manual = document.createElement("input");
+            manual.type = "number";
+            manual.min = "0";
+            manual.placeholder = "추가 금액";
+            manual.className = "manual-override";
+            manual.dataset.rowId = cr.dataset.rowId;
+            manual.addEventListener("input", updateEditComputedShares);
+            const comp = document.createElement("span");
+            comp.className = "computed-share";
+            comp.dataset.rowId = cr.dataset.rowId;
+            comp.textContent = formatAmount(0, curCode);
+            group.appendChild(label);
+            group.appendChild(manual);
+            group.appendChild(comp);
+            row.appendChild(group);
+          });
+          container.appendChild(row);
+        });
+      }
+      
+      function updateEditComputedShares() {
+        const currRows = document.querySelectorAll("#editExpenseCurrenciesContainer .expense-currency-row");
+        currRows.forEach(cr => {
+          const rowId = cr.dataset.rowId;
+          const curCode = cr.querySelector("select").value;
+          const total = parseFloat(cr.querySelector("input").value) || 0;
+          const rows = document.querySelectorAll("#editDistributionContainer .distribution-row");
+          let selected = [];
+          rows.forEach(dr => { if (dr.querySelector("input.distribution-check").checked) selected.push(dr); });
+          let manualSum = 0;
+          selected.forEach(dr => {
+            const val = parseFloat(dr.querySelector(`input.manual-override[data-row-id="${rowId}"]`).value) || 0;
+            manualSum += val;
+          });
+          let remainder = total - manualSum;
+          if (remainder < 0) remainder = 0;
+          let share = selected.length > 0 ? remainder / selected.length : 0;
+          selected.forEach(dr => {
+            const val = parseFloat(dr.querySelector(`input.manual-override[data-row-id="${rowId}"]`).value) || 0;
+            let compVal = share + val;
+            dr.querySelector(`span.computed-share[data-row-id="${rowId}"]`).textContent = formatAmount(compVal, curCode);
+          });
+          rows.forEach(dr => {
+            if (!dr.querySelector("input.distribution-check").checked) {
+              dr.querySelector(`span.computed-share[data-row-id="${rowId}"]`).textContent = formatAmount(0, curCode);
+            }
+          });
+        });
+      }
+      
+      /* 페이지 로드시 모달 숨김 */
+      window.onload = function() {
+        document.getElementById("settingsModal").style.display = "none";
+        document.getElementById("editExpenseModal").style.display = "none";
+      };
+      
+    }); // End of DOMContentLoaded
   </script>
 </body>
 </html>
